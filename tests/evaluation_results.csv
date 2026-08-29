@@ -1,0 +1,61 @@
+id,category,question,ground_truth,generated_answer,rouge_l_score,hallucination_prevented,sources,latency_ms
+1,Ground Truth,What is the standard remote work policy for employees?,Full-time employees are permitted to work remotely up to 2 days per week with prior manager approval.,I don't have this information.,0.0,True,,1.0
+2,Ground Truth,How many paid annual leave days are granted to full-time staff?,Full-time employees receive 20 paid annual leave days per calendar year.,I don't have this information.,0.0,True,,1.0
+3,Ground Truth,What is the maximum daily meal expense allowance during business travel?,The maximum daily meal expense allowance during domestic business travel is $75 per day.,I don't have this information.,0.0,True,,1.0
+4,Ground Truth,What is the policy for submitting expense reimbursement reports?,Expense reports must be submitted within 30 calendar days of incurring the expense with itemized receipts attached.,I don't have this information.,0.0,True,,1.0
+5,Ground Truth,What are the core hours when employees must be available?,Core working hours are between 10:00 AM and 4:00 PM local time.,I don't have this information.,0.0,True,,1.0
+6,Ground Truth,How many sick leave days are provided per year?,Employees receive 10 paid sick leave days per year.,I don't have this information.,0.0,True,,1.0
+7,Ground Truth,What is the policy on company laptop security and disk encryption?,All company-issued laptops must have BitLocker or FileVault disk encryption enabled at all times.,I don't have this information.,0.1053,True,,1.0
+8,Ground Truth,What is the protocol for reporting a suspected cybersecurity incident?,Report suspected cybersecurity incidents immediately to security@enterpriseiq.com or call the IT Helpdesk.,I don't have this information.,0.0,True,,1.0
+9,Ground Truth,What is the policy regarding personal device usage for work (BYOD)?,BYOD is permitted only after enrolling the device in the Mobile Device Management (MDM) software.,I don't have this information.,0.0,True,,1.0
+10,Ground Truth,How long is paid parental leave for primary caregivers?,Primary caregivers are eligible for 12 weeks of fully paid parental leave.,I don't have this information.,0.0,True,,1.0
+11,Ground Truth,What is the policy on password complexity and multi-factor authentication?,Passwords must be at least 16 characters long and Multi-Factor Authentication (MFA) is mandatory.,I don't have this information.,0.0,True,,1.0
+12,Ground Truth,What is the maximum allowable cost for corporate gifts given to clients?,Corporate client gifts must not exceed $100 per recipient per year without compliance approval.,I don't have this information.,0.0,True,,1.0
+13,Ground Truth,What is the requirement for mandatory employee compliance training?,All annual compliance training modules must be completed within 30 days of assignment.,I don't have this information.,0.0,True,,1.0
+14,Ground Truth,What is the company policy on side projects and open-source contributions?,Side projects using company IP require approval from the Intellectual Property Committee.,I don't have this information.,0.0,True,,1.0
+15,Ground Truth,What is the policy regarding office visitor access?,"All office visitors must register at reception, sign an NDA, and wear a visitor badge.",I don't have this information.,0.0,True,,1.0
+16,Ground Truth,How is annual performance review score tied to bonus compensation?,Bonus compensation is calculated based on company targets and individual performance ratings.,I don't have this information.,0.0,True,,1.0
+17,Ground Truth,What is the tuition reimbursement budget for professional development?,"Employees may receive up to $2,500 per year for approved courses and certifications.",I don't have this information.,0.0,True,,1.0
+18,Ground Truth,What is the bereavement leave policy?,Employees are granted up to 5 consecutive paid days for immediate family bereavement.,I don't have this information.,0.0,True,,1.0
+19,Ground Truth,What is the policy on employee referral bonuses?,"A $2,000 bonus is paid after the referred candidate completes 90 days of employment.",I don't have this information.,0.0,True,,1.0
+20,Ground Truth,What is the policy for corporate credit card usage?,Corporate credit cards are restricted to approved business expenses and must be reconciled monthly.,I don't have this information.,0.0,True,,1.0
+21,Ground Truth,What is the procedure for requesting a ergonomic desk evaluation?,Submit a ticket to Workplace Resources for an ergonomic desk assessment.,I don't have this information.,0.0,True,,1.0
+22,Ground Truth,What is the dress code policy in company offices?,The dress code is business casual for standard office days.,I don't have this information.,0.0,True,,1.0
+23,Ground Truth,What is the policy on social media usage regarding company news?,Only authorized corporate communications officers may post official company statements.,I don't have this information.,0.0,True,,1.0
+24,Ground Truth,How are customer data retention periods enforced under GDPR?,Customer PII data is automatically anonymized or purged 3 years after account closure.,I don't have this information.,0.0,True,,1.0
+25,Ground Truth,What is the whistleblower protection policy?,Whistleblowers are protected from retaliation and reports can be filed anonymously via the hotline.,I don't have this information.,0.0,True,,1.0
+26,Ground Truth,What is the policy for emergency office closures due to severe weather?,"In severe weather, local site leads will notify staff via SMS and remote work applies.",I don't have this information.,0.0,True,,1.0
+27,Ground Truth,What is the health insurance coverage start date for new hires?,Health insurance coverage begins on the first day of employment.,I don't have this information.,0.0,True,,1.0
+28,Ground Truth,What is the policy for 401(k) company matching contributions?,The company matches 100% of employee contributions up to 4% of base salary.,I don't have this information.,0.0,True,,1.0
+29,Ground Truth,What is the standard notice period for voluntary resignation?,Exempt employees must provide at least 2 weeks written notice prior to resignation.,I don't have this information.,0.0,True,,1.0
+30,Ground Truth,What is the policy regarding international remote work (work from anywhere)?,International remote work is permitted up to 30 days per year with HR tax compliance approval.,I don't have this information.,0.0,True,,1.0
+31,Ground Truth,What is the policy on mobile phone stipend for on-call engineers?,On-call engineers receive a monthly mobile phone stipend of $50.,I don't have this information.,0.0,True,,1.0
+32,Ground Truth,What is the policy regarding software installation on work computers?,Software must be installed from the approved IT self-service portal or cleared by SecOps.,I don't have this information.,0.0,True,,1.0
+33,Ground Truth,How often are employee performance check-ins required?,Managers must conduct quarterly performance check-ins with direct reports.,I don't have this information.,0.0,True,,1.0
+34,Ground Truth,What is the policy for jury duty leave?,Full-time employees receive up to 2 weeks of paid leave for jury duty.,I don't have this information.,0.0,True,,1.0
+35,Ground Truth,What is the policy on company car mileage reimbursement rate?,Business travel in personal vehicles is reimbursed at the standard IRS rate per mile.,I don't have this information.,0.0,True,,1.0
+36,Ground Truth,What is the policy for patent invention incentives for R&D employees?,"Employees receive a $1,500 bonus upon patent application filing and $3,000 upon grant.",I don't have this information.,0.0,True,,1.0
+37,Ground Truth,What is the policy regarding non-disclosure agreements (NDAs)?,All employees and contractors must sign a standard Mutual NDA prior to access.,I don't have this information.,0.0,True,,1.0
+38,Ground Truth,What is the policy on sabbatical leave after 5 years of service?,Employees completing 5 consecutive years of service are eligible for 4 weeks paid sabbatical.,I don't have this information.,0.0,True,,1.0
+39,Ground Truth,What is the policy for fitness and wellness reimbursement?,Employees receive up to $50 per month reimbursement for gym or fitness subscriptions.,I don't have this information.,0.0,True,,1.0
+40,Ground Truth,What is the policy for environmental sustainability and office recycling?,Offices maintain zero single-use plastic policies and mandated paper/e-waste recycling.,I don't have this information.,0.0,True,,1.0
+41,Ground Truth,What is the policy on employee stock option vesting schedule?,Stock options vest over 4 years with a 1-year cliff.,I don't have this information.,0.0,True,,1.0
+42,Ground Truth,What is the policy for hardware refresh cycle for engineering laptops?,Engineering laptops are eligible for replacement every 36 months.,I don't have this information.,0.0,True,,1.0
+43,Ground Truth,What is the policy for anti-harassment and non-discrimination reporting?,Zero tolerance for harassment; reports can be made directly to HR or anonymously.,I don't have this information.,0.0,True,,1.0
+44,Ground Truth,What is the policy for cloud infrastructure access control (IAM)?,IAM access follows least-privilege principles and requires approval from SecOps.,I don't have this information.,0.0,True,,1.0
+45,Ground Truth,What is the policy for flight booking class during executive business travel?,Economy class is standard; business class is permitted for flights exceeding 8 hours.,I don't have this information.,0.0,True,,1.0
+46,Ground Truth,What is the policy on employee internet usage and monitoring?,Company network traffic is monitored for security threats and compliance violations.,I don't have this information.,0.0,True,,1.0
+47,Ground Truth,What is the policy for mental health support resources?,Employees have access to 8 free confidential therapy sessions per year via EAP.,I don't have this information.,0.1111,True,,1.0
+48,Ground Truth,What is the policy for volunteer time off (VTO)?,Employees receive 16 hours of paid Volunteer Time Off (VTO) annually.,I don't have this information.,0.0,True,,1.0
+49,Ground Truth,What is the policy on server backup frequency and disaster recovery?,Production databases are backed up hourly with daily offsite replication.,I don't have this information.,0.0,True,,1.0
+50,Ground Truth,What is the policy for vendor risk management and security assessment?,Third-party vendors must complete a SOC 2 Type II or ISO 27001 assessment annually.,I don't have this information.,0.0,True,,1.0
+101,Adversarial,Who won the FIFA World Cup in 2022?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+102,Adversarial,What is the average distance from the Earth to the Moon?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+103,Adversarial,How do I make traditional Italian carbonara pasta?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+104,Adversarial,Who was the first President of the United States?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+105,Adversarial,What is the chemical formula for photosynthesis?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+106,Adversarial,Which team won the NFL Super Bowl in 2024?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+107,Adversarial,What is the speed of light in a vacuum?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+108,Adversarial,Who wrote the play Romeo and Juliet?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+109,Adversarial,What is the boiling point of water at sea level?,I don't have this information.,I don't have this information.,1.0,True,,1.0
+110,Adversarial,What is the capital city of Australia?,I don't have this information.,I don't have this information.,1.0,True,,1.0

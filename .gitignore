@@ -1,0 +1,43 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Environment Variables & Secrets
+.env
+.env.local
+*.pem
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Test & Coverage Artifacts
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.hypothesis/
+
+# Local Vector Data & Large Temporary Files
+data/vectors.npy
+data/metadata.pkl
+*.log
+
+# Terraform State & Lock
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+
+# Node & Miscellaneous
+node_modules/
+dist/
+build/

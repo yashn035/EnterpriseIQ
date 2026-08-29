@@ -1,0 +1,50 @@
+[
+  {
+    "id": "5d106610-50ea-47b5-9943-ee7fc5cefaea",
+    "source_file": "benefits_and_leave_policy.pdf",
+    "page_number": 1,
+    "text": "EnterpriseIQ Benefits Policy."
+  },
+  {
+    "id": "0bdaa17c-6c81-499b-8ca2-253f11f79831",
+    "source_file": "benefits_and_leave_policy.pdf",
+    "page_number": 1,
+    "text": "Full-time employees receive 20 paid annual leave days per calendar year. Primary caregivers receive 16 weeks of fully paid parental leave."
+  },
+  {
+    "id": "7fd14727-0570-4bba-8d1e-f2fe984bb6fb",
+    "source_file": "cybersecurity_policy.pdf",
+    "page_number": 1,
+    "text": "EnterpriseIQ Cybersecurity Policy."
+  },
+  {
+    "id": "1b60feaa-5d96-4b61-8fbb-7fccce23121b",
+    "source_file": "cybersecurity_policy.pdf",
+    "page_number": 1,
+    "text": "All employees must complete mandatory cybersecurity training annually in Q1. Security incidents must be reported within 1 hour."
+  },
+  {
+    "id": "1453320f-a344-4c9d-8278-3c608bd4385e",
+    "source_file": "remote_work_policy.pdf",
+    "page_number": 1,
+    "text": "EnterpriseIQ Remote Work Policy."
+  },
+  {
+    "id": "267db5fa-cf47-4e63-b710-2fe051ae441b",
+    "source_file": "remote_work_policy.pdf",
+    "page_number": 1,
+    "text": "Full-time employees are eligible for hybrid remote work up to 2 days per week with prior manager approval. Core hours are 10:00 AM to 4:00 PM."
+  },
+  {
+    "id": "a1125397-209d-4660-ab5c-9cac8f134f87",
+    "source_file": "sample_policy.pdf",
+    "page_number": 1,
+    "text": "Remote work policy allows 3 days per week."
+  },
+  {
+    "id": "a955c51d-2cd1-410d-86e6-f030b9d28405",
+    "source_file": "sample_policy.pdf",
+    "page_number": 2,
+    "text": "Leave policy provides 20 annual days."
+  }
+]

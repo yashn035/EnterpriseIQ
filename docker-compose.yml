@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enterprise_iq_api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: enterprise_iq_frontend
+    command: ["streamlit", "run", "frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000/ask
+    env_file:
+      - .env
+    depends_on:
+      - api
+    restart: unless-stopped

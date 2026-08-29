@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-08-29T09:55:44Z",
+  "test_status": "FAILED",
+  "total_evaluations": 60,
+  "avg_rouge_l_score": 0.0043,
+  "min_rouge_l_threshold": 0.6,
+  "adversarial_pass_rate_pct": 100.0,
+  "hallucination_detected": false,
+  "csv_report_path": "tests\\evaluation_results.csv"
+}

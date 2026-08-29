@@ -1,0 +1,84 @@
+EnterpriseIQ - End-to-End Enterprise RAG System
+==================================================
+
+PROJECT SPECIFICATION & ARCHITECTURE OVERVIEW
+
+1. Folder Structure:
+   - data/raw/
+   - src/ingestion/
+   - src/retrieval/
+   - src/generation/
+   - src/api/
+   - frontend/
+   - tests/
+   - scripts/
+
+2. Dependencies (requirements.txt):
+   - langchain
+   - langchain-experimental
+   - pinecone-client
+   - sentence-transformers
+   - pypdf
+   - fastapi
+   - uvicorn
+   - streamlit
+   - python-dotenv
+   - huggingface-hub
+   - requests
+   - wandb
+   - pytest
+   - tqdm
+   - rouge-score
+
+3. Environment Variables (.env.example):
+   - PINECONE_API_KEY
+   - PINECONE_INDEX_NAME
+   - TGI_ENDPOINT_URL
+   - WANDB_API_KEY
+
+4. Data Ingestion Pipeline (src/ingestion/process_pdfs.py):
+   - Recursively scan data/raw/ for all PDF files.
+   - Extract text using pypdf.
+   - Implement semantic chunking via langchain_experimental.text_splitter.SemanticChunker with sentence-transformers/all-MiniLM-L6-v2 (percentile breakpoint threshold).
+   - Assign unique UUIDs to each chunk.
+   - Save metadata: id, source_file, page_number, text.
+   - Export all chunks to data/chunks.json.
+   - Show progress using tqdm.
+
+5. Retrieval & Vector Indexing (src/retrieval/pinecone_upload.py):
+   - Embed chunks using sentence-transformers/all-MiniLM-L6-v2.
+   - Initialize Pinecone Python SDK (v5 syntax).
+   - Create Serverless index (AWS us-east-1, cosine metric) if missing.
+   - Upsert vectors in batches of 100.
+   - Include source_file, page_number, and text in vector metadata.
+   - Log execution time and total vectors upserted.
+
+6. Generation Engine & RAG Chain (src/generation/rag_chain.py):
+   - RAGChain class with Pinecone vector retrieval and Mistral-7B TGI LLM integration.
+   - Embed queries using MiniLM and retrieve top 5 chunks.
+   - Construct prompt template:
+     'You are a strict policy assistant. Answer ONLY based on the provided context. For every factual claim, cite the exact source file name in brackets [Source: filename.pdf]. If the context does not contain the answer, reply "I don't have this information." Context: {context} Question: {question} Answer:'
+   - Execute HTTP call to TGI endpoint and return {'answer': str, 'sources': list, 'latency_ms': float}.
+
+7. API Layer (src/api/main.py):
+   - FastAPI application.
+   - POST /ask endpoint taking {"question": str}.
+   - Singleton pattern for RAGChain initialization.
+   - Enable CORS middleware (allow_origins=["*"]).
+   - Log question, answer, sources, and latency to Weights & Biases (wandb) for every request.
+
+8. Frontend Interface (frontend/app.py):
+   - Streamlit chat UI (st.chat_message, st.chat_input).
+   - Display answer alongside expandable boxes for source document citations.
+   - Show response latency badges.
+
+9. Benchmarking & Evaluation (tests/evaluate_rouge.py):
+   - 50 ground-truth QA tests derived directly from enterprise policies.
+   - Calculate ROUGE-L scores using LCS algorithm.
+   - 10 adversarial out-of-context tests verifying "I don't have this information." fallback.
+   - Log results to tests/evaluation_results.csv and summary table to Weights & Biases.
+
+10. Containerization & Cloud Deployment:
+    - Dockerfile (python:3.10-slim, port 8000, uvicorn entrypoint).
+    - docker-compose.yml (api on 8000, frontend on 8501).
+    - scripts/deploy_aws.sh (build image, login to ECR, tag, push, output aws ec2 run-instances command for t2.medium).

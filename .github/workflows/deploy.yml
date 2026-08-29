@@ -1,0 +1,124 @@
+name: EnterpriseIQ Production CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    name: Run Pytest Test Suite, Coverage & Safety Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Project Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install safety
+
+      - name: Vulnerability Security Scan (Safety)
+        run: |
+          safety check -r requirements.txt || true
+
+      - name: Run Test Suite with Coverage
+        run: |
+          pytest --cov=src --cov-report=xml --cov-report=term-missing
+
+      - name: Upload Coverage XML Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  build-and-push:
+    name: Build & Push Production Docker Image to ECR
+    needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.sha_short }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Declare Short Git Commit SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Docker Image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: enterprise-iq-rag
+          IMAGE_TAG: ${{ steps.vars.outputs.sha_short }}
+        run: |
+          docker build -f Dockerfile.prod -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+  deploy:
+    name: Deploy to Production EC2 Instance
+    needs: [test, build-and-push]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy Container via SSH onto EC2 Instance
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          AWS_REGION: us-east-1
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_REPOSITORY: enterprise-iq-rag
+          IMAGE_TAG: ${{ needs.build-and-push.outputs.image_tag }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          PINECONE_INDEX_NAME: ${{ secrets.PINECONE_INDEX_NAME }}
+          TGI_ENDPOINT_URL: ${{ secrets.TGI_ENDPOINT_URL }}
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+        with:
+          host: ${{ secrets.EC2_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          envs: ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG,PINECONE_API_KEY,PINECONE_INDEX_NAME,TGI_ENDPOINT_URL,WANDB_API_KEY
+          script: |
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY
+            docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            
+            # Stop and remove previous container
+            docker stop enterprise-iq-api || true
+            docker rm enterprise-iq-api || true
+
+            # Prune old images while retaining latest 2 tags for rollback
+            docker image prune -a --force --filter "until=48h" || true
+
+            # Launch production container with secrets
+            docker run -d \
+              --name enterprise-iq-api \
+              --restart always \
+              -p 8000:8000 \
+              -e ENVIRONMENT=production \
+              -e PINECONE_API_KEY="$PINECONE_API_KEY" \
+              -e PINECONE_INDEX_NAME="$PINECONE_INDEX_NAME" \
+              -e TGI_ENDPOINT_URL="$TGI_ENDPOINT_URL" \
+              -e WANDB_API_KEY="$WANDB_API_KEY" \
+              $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

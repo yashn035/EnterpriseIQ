@@ -1,0 +1,36 @@
+# LLM & RAG Frameworks
+langchain
+langchain-experimental
+
+# Vector DB & Embeddings
+pinecone
+sentence-transformers
+
+# Document Processors & Utilities
+pypdf
+python-dotenv
+huggingface-hub
+requests
+tqdm
+cachetools
+
+# Backend API
+fastapi
+uvicorn
+slowapi
+gunicorn
+apscheduler
+
+# Web UI
+streamlit
+
+# DevOps, MLOps & Tracking
+docker
+wandb
+prometheus-client
+
+# Testing
+pytest
+pytest-cov
+httpx
+rouge-score
