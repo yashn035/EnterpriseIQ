@@ -1,48 +1,66 @@
 [
   {
-    "id": "5d106610-50ea-47b5-9943-ee7fc5cefaea",
+    "id": "16e9f5a5-20c2-4586-bf8f-d72271e0521d",
     "source_file": "benefits_and_leave_policy.pdf",
     "page_number": 1,
     "text": "EnterpriseIQ Benefits Policy."
   },
   {
-    "id": "0bdaa17c-6c81-499b-8ca2-253f11f79831",
+    "id": "c78e1cf8-e32b-4a7c-9d61-a872227b6737",
     "source_file": "benefits_and_leave_policy.pdf",
     "page_number": 1,
     "text": "Full-time employees receive 20 paid annual leave days per calendar year. Primary caregivers receive 16 weeks of fully paid parental leave."
   },
   {
-    "id": "7fd14727-0570-4bba-8d1e-f2fe984bb6fb",
+    "id": "cae78e9b-99af-4964-a5d1-8fe801ce2b08",
     "source_file": "cybersecurity_policy.pdf",
     "page_number": 1,
     "text": "EnterpriseIQ Cybersecurity Policy."
   },
   {
-    "id": "1b60feaa-5d96-4b61-8fbb-7fccce23121b",
+    "id": "2a620af4-35b3-41ea-a9d6-abf23fa09a08",
     "source_file": "cybersecurity_policy.pdf",
     "page_number": 1,
     "text": "All employees must complete mandatory cybersecurity training annually in Q1. Security incidents must be reported within 1 hour."
   },
   {
-    "id": "1453320f-a344-4c9d-8278-3c608bd4385e",
+    "id": "77c4315e-ed45-404e-9483-ff232848ded5",
     "source_file": "remote_work_policy.pdf",
     "page_number": 1,
     "text": "EnterpriseIQ Remote Work Policy."
   },
   {
-    "id": "267db5fa-cf47-4e63-b710-2fe051ae441b",
+    "id": "482257bf-67e1-41ac-b5ef-f5713b4cc93b",
     "source_file": "remote_work_policy.pdf",
     "page_number": 1,
     "text": "Full-time employees are eligible for hybrid remote work up to 2 days per week with prior manager approval. Core hours are 10:00 AM to 4:00 PM."
   },
   {
-    "id": "a1125397-209d-4660-ab5c-9cac8f134f87",
+    "id": "86ddab8a-cd33-4a96-b573-45d793b2dda0",
+    "source_file": "sample.pdf",
+    "page_number": 1,
+    "text": "Remote work policy allows 3 days per week."
+  },
+  {
+    "id": "83db3d22-611e-4091-b634-222b16f33c5f",
+    "source_file": "sample.pdf",
+    "page_number": 2,
+    "text": "Employees get 20 paid annual leave days."
+  },
+  {
+    "id": "a2395029-c883-43c0-bbd5-1f362694c86b",
+    "source_file": "sample.pdf",
+    "page_number": 3,
+    "text": "Cybersecurity policy requires 2FA for all accounts."
+  },
+  {
+    "id": "4d2e4499-f9c0-4fa7-8d64-462752207fc1",
     "source_file": "sample_policy.pdf",
     "page_number": 1,
     "text": "Remote work policy allows 3 days per week."
   },
   {
-    "id": "a955c51d-2cd1-410d-86e6-f030b9d28405",
+    "id": "9d73c010-a759-44af-acb9-867ce0a01dac",
     "source_file": "sample_policy.pdf",
     "page_number": 2,
     "text": "Leave policy provides 20 annual days."

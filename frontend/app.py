@@ -68,7 +68,7 @@ st.markdown("""
 st.sidebar.image("https://img.icons8.com/isometric-line/100/processor.png", width=64)
 st.sidebar.markdown("## ⚙️ Configuration")
 
-api_endpoint = st.sidebar.text_input("Backend API Endpoint", value=os.getenv("API_URL", "http://localhost:8000/ask"))
+api_endpoint = st.sidebar.text_input("Backend API Endpoint", value=os.getenv("API_URL", "https://a3c28807b77848.lhr.life/ask"))
 api_base_url = api_endpoint.rsplit("/ask", 1)[0]
 
 st.sidebar.markdown("---")

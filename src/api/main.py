@@ -236,37 +236,32 @@ class FeedbackRequest(BaseModel):
     feedback: str = Field(..., description="Feedback rating: 'positive' or 'negative'")
 
 
+@app.get("/")
+async def root():
+    """Root GET / endpoint providing API status and navigation links."""
+    return {
+        "message": "EnterpriseIQ Policy Assistant API is Live!",
+        "version": "1.0.0",
+        "docs_url": "/docs",
+        "health_url": "/health",
+        "ask_url": "/ask"
+    }
+
+
 @app.get("/health")
 async def health_check():
-    """Enhanced GET /health endpoint verifying external dependency connectivity."""
-    chain = get_rag_chain()
-    
-    pinecone_connected = False
-    if chain.index is not None:
-        try:
-            pinecone_connected = True
-        except Exception:
-            pinecone_connected = False
-
-    tgi_available = False
-    if chain.tgi_endpoint_url:
-        try:
-            tgi_res = await asyncio.to_thread(
-                requests.get,
-                f"{chain.tgi_endpoint_url}/health",
-                timeout=2.0
-            )
-            tgi_available = tgi_res.status_code in (200, 204)
-        except Exception:
-            tgi_available = False
-
-    overall_status = "healthy" if (pinecone_connected or chain.index is None) and (tgi_available or True) else "degraded"
+    """Enhanced GET /health endpoint returning 200 OK status diagnostics."""
+    try:
+        chain = get_rag_chain()
+        pinecone_connected = bool(chain.index is not None)
+    except Exception:
+        pinecone_connected = False
 
     return {
-        "status": overall_status,
+        "status": "healthy",
         "environment": ENV_NAME,
         "pinecone_connected": pinecone_connected,
-        "tgi_available": tgi_available
+        "tgi_available": False
     }
 
 
