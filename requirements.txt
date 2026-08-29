@@ -5,6 +5,7 @@ langchain-experimental
 # Vector DB & Embeddings
 pinecone
 sentence-transformers
+faiss-cpu
 
 # Document Processors & Utilities
 pypdf
