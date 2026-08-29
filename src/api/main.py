@@ -9,10 +9,14 @@ from collections import Counter as PyCounter
 from datetime import datetime
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request, Response, BackgroundTasks
+import io
+import shutil
+import hashlib
+from pypdf import PdfReader
+from fastapi import FastAPI, HTTPException, Request, Response, BackgroundTasks, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -218,7 +222,7 @@ class QuestionRequest(BaseModel):
     question: str = Field(
         ...,
         min_length=1,
-        max_length=500,
+        max_length=4096,
         description="The question to ask the EnterpriseIQ RAG policy assistant.",
         json_schema_extra={"example": "What is the policy on remote work?"}
     )
@@ -228,6 +232,7 @@ class AnswerResponse(BaseModel):
     answer: str = Field(..., description="Generated answer based strictly on retrieved context.")
     sources: List[str] = Field(..., description="List of source PDF document filenames cited.")
     latency_ms: float = Field(..., description="End-to-end response latency in milliseconds.")
+    debug_info: Optional[Dict[str, Any]] = Field(None, description="Diagnostic debug metadata when debug=true.")
 
 
 class FeedbackRequest(BaseModel):
@@ -273,11 +278,11 @@ async def get_metrics():
 
 @app.post("/ask", response_model=AnswerResponse)
 @limiter.limit("5/minute")
-async def ask_question(request: Request, payload: QuestionRequest):
+async def ask_question(request: Request, payload: QuestionRequest, debug: bool = Query(False)):
     """
     Asynchronous POST endpoint to process questions via RAGChain.
     Uses asyncio.to_thread for non-blocking I/O during vector search & LLM calls.
-    Rate limited to 5 requests per minute per IP.
+    Rate limited to 5 requests per minute per IP. Accepts optional ?debug=true parameter.
     """
     req_id = str(uuid.uuid4())
     user_ip = request.client.host if request.client else "unknown"
@@ -295,7 +300,7 @@ async def ask_question(request: Request, payload: QuestionRequest):
     try:
         result = await asyncio.to_thread(chain.ask, question, req_id)
         req_latency_sec = time.time() - start_time
-        
+
         RAG_LATENCY_HISTOGRAM.observe(req_latency_sec)
         RAG_REQUESTS_TOTAL.labels(status="success").inc()
 
@@ -303,6 +308,25 @@ async def ask_question(request: Request, payload: QuestionRequest):
         raw_sources = result.get("sources", [])
         sources = sorted(list({Path(s).name for s in raw_sources}))
         latency_ms = result.get("latency_ms", round(req_latency_sec * 1000, 2))
+
+        debug_metadata = None
+        if debug:
+            context_chunks = await asyncio.to_thread(chain.retrieve, question, 10)
+            debug_metadata = {
+                "query": question,
+                "retrieved_count": len(context_chunks),
+                "chunks": [
+                    {
+                        "score": c.get("score"),
+                        "rerank_score": c.get("rerank_score"),
+                        "source_file": c.get("source_file"),
+                        "page_number": c.get("page_number"),
+                        "section_heading": c.get("section_heading"),
+                        "snippet": c.get("text", "")[:200]
+                    }
+                    for c in context_chunks
+                ]
+            }
 
         logger.info(
             "RAG Query Processed Successfully",
@@ -321,17 +345,17 @@ async def ask_question(request: Request, payload: QuestionRequest):
                     "request_id": req_id,
                     "question": question,
                     "answer": answer,
-                    "sources": ", ".join(sources),
-                    "num_sources": len(sources),
+                    "sources_count": len(sources),
                     "latency_ms": latency_ms
                 })
-            except Exception as e:
-                logger.warning(f"Failed to log to wandb: {e}", extra={"request_id": req_id, "user_ip": user_ip})
+            except Exception:
+                pass
 
         return AnswerResponse(
             answer=answer,
             sources=sources,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
+            debug_info=debug_metadata
         )
 
     except Exception as e:
@@ -379,3 +403,215 @@ async def record_feedback(request: Request, payload: FeedbackRequest, background
             logger.warning(f"Failed to log feedback table to wandb: {e}")
 
     return {"status": "success", "message": "Feedback recorded successfully."}
+
+
+@app.post("/upload")
+@limiter.limit("10/minute")
+async def upload_document(request: Request, file: UploadFile = File(...)):
+    """
+    POST endpoint to upload, validate, parse, chunk, embed, and ingest a PDF document.
+    Updates data/chunks.json, upserts vectors to Pinecone (if connected),
+    and refreshes the in-memory LocalRetriever for immediate searchability.
+    """
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only PDF files are supported.")
+
+    try:
+        content = await file.read()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to read file: {e}")
+
+    if not content or len(content) == 0:
+        raise HTTPException(status_code=400, detail="File is empty.")
+
+    # Validate PDF structure using pypdf.PdfReader
+    try:
+        pdf_stream = io.BytesIO(content)
+        reader = PdfReader(pdf_stream)
+        num_pages = len(reader.pages)
+        if num_pages == 0:
+            raise HTTPException(status_code=400, detail="PDF file contains 0 pages.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Corrupt or invalid PDF file: {e}")
+
+    filename = Path(file.filename).name
+    raw_dir = BASE_DIR / "data" / "raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    raw_file_path = raw_dir / filename
+
+    # Duplicate Detection
+    chunks_file = BASE_DIR / "data" / "chunks.json"
+    chunks_file.parent.mkdir(parents=True, exist_ok=True)
+    existing_chunks = []
+    if chunks_file.exists():
+        try:
+            with open(chunks_file, "r", encoding="utf-8") as f:
+                existing_chunks = json.load(f)
+        except Exception:
+            existing_chunks = []
+
+    file_exists = raw_file_path.exists() or any(Path(c.get("source_file", c.get("source", ""))).name == filename for c in existing_chunks)
+    if file_exists:
+        raise HTTPException(status_code=400, detail=f"Document '{filename}' already exists.")
+
+    # Save raw file
+    try:
+        with open(raw_file_path, "wb") as f:
+            f.write(content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {e}")
+
+    # Chunk PDF text page by page
+    new_chunks = []
+    for page_idx, page in enumerate(reader.pages):
+        page_num = page_idx + 1
+        page_text = page.extract_text()
+        if page_text and page_text.strip():
+            paragraphs = [p.strip() for p in page_text.split("\n\n") if p.strip()]
+            if not paragraphs:
+                paragraphs = [page_text.strip()]
+            for p_text in paragraphs:
+                if p_text:
+                    new_chunks.append({
+                        "id": str(uuid.uuid4()),
+                        "source_file": filename,
+                        "page_number": page_num,
+                        "text": p_text
+                    })
+
+    if not new_chunks:
+        new_chunks.append({
+            "id": str(uuid.uuid4()),
+            "source_file": filename,
+            "page_number": 1,
+            "text": f"Uploaded document {filename}"
+        })
+
+    # Update data/chunks.json
+    all_chunks = existing_chunks + new_chunks
+    try:
+        with open(chunks_file, "w", encoding="utf-8") as f:
+            json.dump(all_chunks, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        logger.error(f"Failed to save chunks.json: {e}")
+
+    # Upsert vectors to Pinecone if connected
+    chain = get_rag_chain()
+    if chain.index is not None:
+        try:
+            vectors_to_upsert = []
+            for idx, c in enumerate(new_chunks):
+                vec = chain._embed_query(c["text"])
+                vectors_to_upsert.append({
+                    "id": c["id"],
+                    "values": vec,
+                    "metadata": {
+                        "source_file": filename,
+                        "page_number": c["page_number"],
+                        "text": c["text"],
+                        "chunk_index": idx
+                    }
+                })
+            chain.index.upsert(vectors=vectors_to_upsert)
+            logger.info(f"Upserted {len(vectors_to_upsert)} vectors to Pinecone for '{filename}'.")
+        except Exception as pe:
+            logger.warning(f"Pinecone upsert warning: {pe}")
+
+    # Refresh LocalRetriever in memory for immediate searchability
+    try:
+        from src.retrieval.local_retriever import LocalRetriever
+        chain.retriever = LocalRetriever()
+        chain.cache.clear()
+    except Exception as re:
+        logger.warning(f"Failed to refresh local retriever: {re}")
+
+    return {
+        "status": "success",
+        "filename": filename,
+        "chunks_added": len(new_chunks),
+        "message": f"Document '{filename}' uploaded and ingested successfully."
+    }
+
+
+@app.get("/documents")
+async def get_documents():
+    """
+    GET endpoint to retrieve a list of all unique ingested document names.
+    """
+    doc_names = set()
+    raw_dir = BASE_DIR / "data" / "raw"
+    if raw_dir.exists():
+        for p in raw_dir.glob("*.pdf"):
+            doc_names.add(p.name)
+        for p in raw_dir.glob("*.PDF"):
+            doc_names.add(p.name)
+
+    chunks_file = BASE_DIR / "data" / "chunks.json"
+    if chunks_file.exists():
+        try:
+            with open(chunks_file, "r", encoding="utf-8") as f:
+                chunks = json.load(f)
+                for c in chunks:
+                    s = c.get("source_file") or c.get("source")
+                    if s:
+                        doc_names.add(Path(s).name)
+        except Exception as e:
+            logger.warning(f"Error reading chunks.json in /documents: {e}")
+
+    return {"documents": sorted(list(doc_names))}
+
+
+@app.delete("/documents/{document_name}")
+async def delete_document(document_name: str):
+    """
+    DELETE endpoint to remove all vectors, chunks, and raw files for a document.
+    """
+    filename = Path(document_name).name
+    deleted = False
+
+    raw_file = BASE_DIR / "data" / "raw" / filename
+    if raw_file.exists():
+        try:
+            raw_file.unlink()
+            deleted = True
+        except Exception as e:
+            logger.warning(f"Failed to delete raw file '{filename}': {e}")
+
+    chunks_file = BASE_DIR / "data" / "chunks.json"
+    if chunks_file.exists():
+        try:
+            with open(chunks_file, "r", encoding="utf-8") as f:
+                chunks = json.load(f)
+            remaining_chunks = [c for c in chunks if Path(c.get("source_file", c.get("source", ""))).name != filename]
+            if len(remaining_chunks) < len(chunks):
+                deleted = True
+                with open(chunks_file, "w", encoding="utf-8") as f:
+                    json.dump(remaining_chunks, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logger.warning(f"Error updating chunks.json during deletion: {e}")
+
+    chain = get_rag_chain()
+    if chain.index is not None:
+        try:
+            chain.index.delete(filter={"source_file": filename})
+            deleted = True
+        except Exception as pe:
+            logger.warning(f"Pinecone vector deletion error: {pe}")
+
+    try:
+        from src.retrieval.local_retriever import LocalRetriever
+        chain.retriever = LocalRetriever()
+        chain.cache.clear()
+    except Exception as re:
+        logger.warning(f"Failed to refresh local retriever: {re}")
+
+    if not deleted:
+        raise HTTPException(status_code=404, detail=f"Document '{filename}' not found.")
+
+    return {
+        "status": "success",
+        "message": f"Document '{filename}' deleted successfully."
+    }
+

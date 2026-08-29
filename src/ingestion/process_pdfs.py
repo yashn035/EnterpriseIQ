@@ -3,7 +3,7 @@ import logging
 import hashlib
 from pathlib import Path
 import uuid
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 
 from pypdf import PdfReader
 from tqdm import tqdm
@@ -83,14 +83,73 @@ class SentenceTransformerEmbeddingsWrapper:
         return self._fallback_embed(text)
 
 
+import re
+
+def extract_section_heading(text: str) -> Optional[str]:
+    """Detects numbered section headings like '5.2 Discipline by Suspension' or ALL-CAPS headings."""
+    # Check for numbered heading e.g. '5.2 Discipline by Suspension'
+    match_num = re.search(r'(\d+\.\d*\.?\s+[A-Z0-9\s/&,–-]+)', text)
+    if match_num:
+        heading = match_num.group(1).strip()
+        if len(heading) < 80:
+            return heading
+
+    # Check for ALL-CAPS headings e.g. 'POLICIES - HUMAN RESOURCE POLICY'
+    for line in text.split("\n"):
+        line_clean = line.strip()
+        if len(line_clean) >= 4 and len(line_clean) <= 60 and line_clean.isupper() and not line_clean.isdigit():
+            return line_clean
+
+    return None
+
+
+def heading_aware_sliding_window_chunk(
+    text: str,
+    chunk_size: int = 1200,
+    chunk_overlap: int = 250
+) -> List[Tuple[str, Optional[str]]]:
+    """Splits text into overlapping character chunks while preserving section heading context."""
+    chunks = []
+    if not text:
+        return chunks
+
+    start = 0
+    text_len = len(text)
+    step = max(1, chunk_size - chunk_overlap)
+    current_heading = None
+
+    while start < text_len:
+        end = min(text_len, start + chunk_size)
+        raw_chunk = text[start:end].strip()
+
+        if raw_chunk:
+            detected_heading = extract_section_heading(raw_chunk)
+            if detected_heading:
+                current_heading = detected_heading
+
+            final_text = raw_chunk
+            if current_heading and current_heading not in raw_chunk:
+                final_text = f"Section {current_heading}: {raw_chunk}"
+
+            chunks.append((final_text, current_heading))
+
+        if end >= text_len:
+            break
+        start += step
+
+    return chunks
+
+
 def process_pdfs(
     raw_dir: Any = None,
     output_file: Any = None,
     embedding_model_name: str = "all-MiniLM-L6-v2",
+    chunk_size: int = 1200,
+    chunk_overlap: int = 250,
 ) -> List[Dict[str, Any]]:
     """
     Recursively scans raw_dir for PDF files using pathlib.Path, extracts text page-by-page using pypdf,
-    performs semantic chunking using SemanticChunker, and outputs all chunks into output_file.
+    performs heading-aware sliding window chunking with character overlap, and outputs chunks with rich metadata.
     """
     raw_path = Path(raw_dir) if raw_dir else (BASE_DIR / "data" / "raw")
     output_path = Path(output_file) if output_file else (BASE_DIR / "data" / "chunks.json")
@@ -100,9 +159,7 @@ def process_pdfs(
         logger.error(f"Raw data directory '{raw_path}' does not exist.")
         return []
 
-    # Recursively find all PDF files (.pdf and .PDF)
     pdf_files = list(raw_path.rglob("*.pdf")) + list(raw_path.rglob("*.PDF"))
-    # Deduplicate in case filesystem is case-insensitive
     pdf_files = sorted(list({p.resolve(): p for p in pdf_files}.values()))
 
     logger.info(f"Found {len(pdf_files)} PDF document(s) in '{raw_path}'.")
@@ -113,50 +170,69 @@ def process_pdfs(
             json.dump([], f, indent=2)
         return []
 
-    # Initialize Embeddings and Semantic Chunker
-    embeddings = SentenceTransformerEmbeddingsWrapper(embedding_model_name)
-    text_splitter = SemanticChunker(
-        embeddings,
-        breakpoint_threshold_type="percentile"
-    )
-
     chunks: List[Dict[str, Any]] = []
 
-    # Process PDFs with progress bar
     for pdf_path in tqdm(pdf_files, desc="Processing PDFs", unit="doc"):
         try:
             reader = PdfReader(str(pdf_path))
+            total_pages = len(reader.pages)
+            full_pdf_text = ""
+            doc_chunks: List[Dict[str, Any]] = []
+            active_section_heading: Optional[str] = None
+
             for page_idx, page in enumerate(reader.pages):
                 page_number = page_idx + 1
-                page_text = page.extract_text()
+                page_text = page.extract_text() or ""
+                full_pdf_text += f"\n--- Page {page_number} ---\n" + page_text
 
-                if not page_text or not page_text.strip():
+                if not page_text.strip():
                     continue
 
-                try:
-                    split_chunks = text_splitter.split_text(page_text.strip())
-                except Exception as e:
-                    logger.warning(f"Semantic chunking fallback for {pdf_path.name} (Page {page_number}): {e}")
-                    split_chunks = [page_text.strip()]
+                page_heading = extract_section_heading(page_text)
+                if page_heading:
+                    active_section_heading = page_heading
 
-                for chunk_text in split_chunks:
-                    clean_text = chunk_text.strip()
-                    if clean_text:
-                        chunks.append({
-                            "id": str(uuid.uuid4()),
-                            "source_file": pdf_path.name,
-                            "page_number": page_number,
-                            "text": clean_text
-                        })
+                page_chunks = heading_aware_sliding_window_chunk(page_text.strip(), chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+                for p_chunk_text, sec_heading in page_chunks:
+                    chunk_heading = sec_heading or active_section_heading or "General Policy"
+                    chunk_idx = len(doc_chunks)
+                    chunk_id = f"{pdf_path.name}_{chunk_idx}"
+                    chunk_obj = {
+                        "id": chunk_id,
+                        "chunk_id": chunk_id,
+                        "document_id": pdf_path.name,
+                        "source": pdf_path.name,
+                        "source_file": pdf_path.name,
+                        "chunk_index": chunk_idx,
+                        "page_number": page_number,
+                        "section_heading": chunk_heading,
+                        "text": p_chunk_text
+                    }
+                    doc_chunks.append(chunk_obj)
+                    chunks.append(chunk_obj)
+
+            # Detailed Diagnostic Log per Document (STEP 1 & STEP 5)
+            logger.info("=======================================================")
+            logger.info(f"HEADING-AWARE PDF DIAGNOSTIC SUMMARY: {pdf_path.name}")
+            logger.info(f"Total pages extracted: {total_pages}")
+            logger.info(f"Total extracted text length: {len(full_pdf_text)} characters")
+            logger.info(f"Total chunks created: {len(doc_chunks)}")
+            for idx, c in enumerate(doc_chunks):
+                snippet = c['text'][:100].replace('\n', ' ')
+                logger.info(f"  Chunk [{idx}] (Page {c['page_number']}, Heading: {c['section_heading']}): {snippet}...")
+            logger.info("=======================================================")
+
         except Exception as e:
             logger.error(f"Error processing PDF '{pdf_path.name}': {e}")
             continue
 
     logger.info(f"Generated {len(chunks)} chunk(s) across {len(pdf_files)} PDF document(s).")
 
-    # Save all chunks to data/chunks.json
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(chunks, f, indent=2, ensure_ascii=False)
+
+    logger.info(f"Successfully written chunks to '{output_path}'.")
+    return chunks
 
     logger.info(f"Successfully written chunks to '{output_path}'.")
     return chunks

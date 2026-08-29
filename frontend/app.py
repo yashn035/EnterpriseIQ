@@ -68,8 +68,67 @@ st.markdown("""
 st.sidebar.image("https://img.icons8.com/isometric-line/100/processor.png", width=64)
 st.sidebar.markdown("## ⚙️ Configuration")
 
-api_endpoint = st.sidebar.text_input("Backend API Endpoint", value=os.getenv("API_URL", "https://a3c28807b77848.lhr.life/ask"))
+api_endpoint = st.sidebar.text_input("Backend API Endpoint", value=os.getenv("API_URL", "http://localhost:8000/ask"))
 api_base_url = api_endpoint.rsplit("/ask", 1)[0]
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("## 📄 Document Management")
+
+# PDF File Uploader Widget
+uploaded_file = st.sidebar.file_uploader("Upload Policy PDF Document", type=["pdf"])
+
+if uploaded_file is not None:
+    st.sidebar.info(f"Selected: **{uploaded_file.name}**")
+    if st.sidebar.button("📤 Upload & Ingest", use_container_width=True):
+        with st.sidebar.status("Uploading & ingesting document...", expanded=True) as status:
+            try:
+                files = {"file": (uploaded_file.name, uploaded_file.getvalue(), "application/pdf")}
+                res = requests.post(f"{api_base_url}/upload", files=files, timeout=60)
+                if res.status_code == 200:
+                    status.update(label="Ingestion complete!", state="complete", expanded=False)
+                    st.sidebar.success(f"Successfully ingested `{uploaded_file.name}`")
+                    st.rerun()
+                else:
+                    err_detail = res.json().get("detail", res.text)
+                    status.update(label="Upload failed", state="error", expanded=False)
+                    st.sidebar.error(f"Error: {err_detail}")
+            except Exception as e:
+                status.update(label="Connection error", state="error", expanded=False)
+                st.sidebar.error(f"Upload connection error: {e}")
+
+st.sidebar.markdown("### 📚 Ingested Documents")
+
+def fetch_ingested_documents():
+    try:
+        res = requests.get(f"{api_base_url}/documents", timeout=5)
+        if res.status_code == 200:
+            return res.json().get("documents", [])
+    except Exception:
+        pass
+    return []
+
+if st.sidebar.button("🔄 Refresh Documents", use_container_width=True):
+    st.rerun()
+
+docs_list = fetch_ingested_documents()
+if docs_list:
+    for doc_name in docs_list:
+        col_doc, col_del = st.sidebar.columns([4, 1])
+        with col_doc:
+            st.markdown(f"✅ `{doc_name}`")
+        with col_del:
+            if st.button("❌", key=f"del_{doc_name}", help=f"Delete {doc_name}"):
+                try:
+                    d_res = requests.delete(f"{api_base_url}/documents/{doc_name}", timeout=10)
+                    if d_res.status_code == 200:
+                        st.sidebar.success(f"Deleted `{doc_name}`")
+                        st.rerun()
+                    else:
+                        st.sidebar.error("Failed to delete document.")
+                except Exception as de:
+                    st.sidebar.error(f"Delete error: {de}")
+else:
+    st.sidebar.caption("No ingested documents found.")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📊 System Specs")

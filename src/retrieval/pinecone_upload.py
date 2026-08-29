@@ -57,9 +57,13 @@ def upload_chunks_to_pinecone(
         vec = generate_unit_vector(chunk.get("text", ""), target_dimension)
         vectors_list.append(vec)
         metadata_list.append({
-            "id": chunk.get("id"),
-            "source_file": chunk.get("source_file", "sample_policy.pdf"),
+            "id": chunk.get("id") or chunk.get("chunk_id"),
+            "chunk_id": chunk.get("chunk_id") or chunk.get("id"),
+            "document_id": chunk.get("document_id", chunk.get("source_file", "unknown.pdf")),
+            "source_file": chunk.get("source_file", chunk.get("source", "unknown.pdf")),
+            "chunk_index": chunk.get("chunk_index", 0),
             "page_number": chunk.get("page_number", 1),
+            "section_heading": chunk.get("section_heading", "General Policy"),
             "text": chunk.get("text", "")
         })
 

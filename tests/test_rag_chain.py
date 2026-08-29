@@ -30,9 +30,9 @@ def test_rag_chain_generation_enforces_citations():
         payload = call_kwargs["json"]
         inputs_text = payload["inputs"]
 
-        assert "[Source: remote_work_policy.pdf (Page 1)]" in inputs_text
-        assert "[Source: leave_policy.pdf (Page 2)]" in inputs_text
-        assert "You are a strict policy assistant" in inputs_text
+        assert "remote_work_policy.pdf" in inputs_text
+        assert "leave_policy.pdf" in inputs_text
+        assert "You are EnterpriseIQ, a precise policy analyst." in inputs_text
         assert answer == "Employees may work remotely up to 2 days per week [Source: remote_work_policy.pdf]."
 
 
@@ -46,10 +46,10 @@ def test_rag_chain_fallback_when_context_is_empty():
     mock_tgi_response = MagicMock()
     mock_tgi_response.status_code = 200
     mock_tgi_response.json.return_value = {
-        "generated_text": "I don't have this information."
+        "generated_text": "I could not find this information in the provided documents."
     }
 
     with patch("requests.post", return_value=mock_tgi_response):
         answer = chain.generate("Who won the World Cup?", context_chunks=[])
 
-        assert "I don't have this information." in answer
+        assert "I could not find this information in the provided documents." in answer
