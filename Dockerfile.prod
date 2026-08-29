@@ -32,6 +32,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /app /app
 
-EXPOSE 8000
+RUN chmod +x /app/start.sh
 
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "src.api.main:app", "--bind", "0.0.0.0:8000", "--timeout", "120"]
+EXPOSE 8000 10000
+
+CMD ["/app/start.sh"]
