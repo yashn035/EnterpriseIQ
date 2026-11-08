@@ -1,0 +1,12 @@
+{
+  "status": "UNMEASURED",
+  "statement": "Ragas metrics (faithfulness, answer relevancy, context precision, context recall) are UNMEASURED because no judge LLM (Mistral TGI or OpenAI) was available at evaluation time. In-scope answer quality is verified only via keyword-contains assertions, not semantic grounding. This is a known measurement gap.",
+  "error": "No judge LLM reachable (TGI offline at http://localhost:8080, OPENAI_API_KEY not configured)",
+  "averages": {
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_precision": null,
+    "context_recall": null
+  },
+  "cases": []
+}

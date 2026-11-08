@@ -1,0 +1,5 @@
+{
+  "prompt_injection_pass_rate": "3/4",
+  "held_out_pass_rate": "9/10",
+  "safety_suite_pass_rate": "14/15"
+}

@@ -1,0 +1,113 @@
+{
+  "timestamp": "2026-11-08T16:59:07.452799Z",
+  "threshold": 0.5,
+  "gate_status": "PASSED",
+  "measurements": {
+    "out_of_scope": {
+      "total_cases": 0,
+      "hallucinations_detected": 0,
+      "refused_correctly": 0,
+      "hallucination_rate": 0.0,
+      "threshold_breached": false
+    },
+    "faithfulness_proxy": {
+      "total_cases": 14,
+      "hallucinations_detected": 7,
+      "faithful_cases": 7,
+      "hallucination_rate": 0.5,
+      "threshold_breached": false
+    },
+    "overall": {
+      "total_cases": 14,
+      "total_hallucinations": 7,
+      "hallucination_rate": 0.5
+    }
+  },
+  "out_of_scope_cases": [],
+  "in_scope_cases": [
+    {
+      "question": "What is the standard remote work policy for employees?",
+      "answer": "Based on the policy documents: \n\u2022 Remote work policy allows 3 days per week.\n\u2022 EnterpriseIQ Remote Work Policy.\n\u2022 Full-time employees are eligible for hybrid remote work up to 2 days per week with prior manager approval.\n[Source: sample.pdf, remote_work_policy.pdf]",
+      "faithfulness": 1.0,
+      "is_hallucination": false
+    },
+    {
+      "question": "How many paid annual leave days are granted to full-time staff?",
+      "answer": "Based on the policy documents: \n\u2022 Full-time employees receive 20 paid annual leave days per calendar year.\n\u2022 Employees get 20 paid annual leave days.\n\u2022 Primary caregivers receive 16 weeks of fully paid parental leave.\n\u2022 Leave policy provides 20 annual days.\n[Source: benefits_and_leave_policy.pdf, sample.pdf, sample_policy.pdf]",
+      "faithfulness": 1.0,
+      "is_hallucination": false
+    },
+    {
+      "question": "What are the core hours when employees must be available?",
+      "answer": "Based on the policy documents: \n\u2022 Core hours are 10:00 AM to 4:00 PM.\n\u2022 Full-time employees are eligible for hybrid remote work up to 2 days per week with prior manager approval.\n[Source: remote_work_policy.pdf]",
+      "faithfulness": 1.0,
+      "is_hallucination": false
+    },
+    {
+      "question": "How many sick leave days are provided per year?",
+      "answer": "Based on the policy documents: \n\u2022 Full-time employees receive 20 paid annual leave days per calendar year.\n\u2022 Leave policy provides 20 annual days.\n\u2022 Employees get 20 paid annual leave days.\n\u2022 Primary caregivers receive 16 weeks of fully paid parental leave.\n[Source: benefits_and_leave_policy.pdf, sample_policy.pdf, sample.pdf]",
+      "faithfulness": 1.0,
+      "is_hallucination": false
+    },
+    {
+      "question": "What is the protocol for reporting a suspected cybersecurity incident?",
+      "answer": "Based on the policy documents: Cybersecurity policy requires 2FA for all accounts.\n[Source: sample.pdf]",
+      "faithfulness": 0.12,
+      "is_hallucination": true
+    },
+    {
+      "question": "What is the policy regarding personal device usage for work (BYOD)?",
+      "answer": "Based on the policy documents: \n\u2022 Remote work policy allows 3 days per week.\n\u2022 EnterpriseIQ Remote Work Policy.\n\u2022 Full-time employees are eligible for hybrid remote work up to 2 days per week with prior manager approval.\n[Source: sample.pdf, remote_work_policy.pdf]",
+      "faithfulness": 0.0,
+      "is_hallucination": true
+    },
+    {
+      "question": "How long is paid parental leave for primary caregivers?",
+      "answer": "Based on the policy documents: \n\u2022 Primary caregivers receive 16 weeks of fully paid parental leave.\n\u2022 Full-time employees receive 20 paid annual leave days per calendar year.\n[Source: benefits_and_leave_policy.pdf]",
+      "faithfulness": 1.0,
+      "is_hallucination": false
+    },
+    {
+      "question": "What is the requirement for mandatory employee compliance training?",
+      "answer": "Based on the policy documents: All employees must complete mandatory cybersecurity training annually in Q1.\n[Source: cybersecurity_policy.pdf]",
+      "faithfulness": 1.0,
+      "is_hallucination": false
+    },
+    {
+      "question": "What is the standard notice period for voluntary resignation?",
+      "answer": "Based on the policy documents: \n\u2022 o Performance evaluation process at the end of the probationary period\n\u2022 o Procedures for Suspension in the incident of employee misconduct\n\u2022 o Processes and circumstances for layoff and termination may be outlined in the policy\n\u2022 o Time frame for employee\u2019s probationary periods\n[Source: 080420092054-gsv5i1.pdf]",
+      "faithfulness": 0.0,
+      "is_hallucination": true
+    },
+    {
+      "question": "What is the policy regarding international remote work (work from anywhere)?",
+      "answer": "Based on the policy documents: \n\u2022 Remote work policy allows 3 days per week.\n\u2022 EnterpriseIQ Remote Work Policy.\n\u2022 Full-time employees are eligible for hybrid remote work up to 2 days per week with prior manager approval.\n[Source: sample.pdf, remote_work_policy.pdf]",
+      "faithfulness": 1.0,
+      "is_hallucination": false
+    },
+    {
+      "question": "What is the policy regarding software installation on work computers?",
+      "answer": "Based on the policy documents: \n\u2022 Remote work policy allows 3 days per week.\n\u2022 EnterpriseIQ Remote Work Policy.\n[Source: sample.pdf, remote_work_policy.pdf]",
+      "faithfulness": 0.0,
+      "is_hallucination": true
+    },
+    {
+      "question": "What is the policy for jury duty leave?",
+      "answer": "Based on the policy documents: \n\u2022 o Processes and circumstances for layoff and termination may be outlined in the policy\n\u2022 The interval for policy review shall be discerned by the Board\n\u2022 The draft of the policy is shared with the management for feedback and\n\u2022 o Procedures for Suspension in the incident of employee misconduct\n[Source: 080420092054-gsv5i1.pdf]",
+      "faithfulness": 0.0,
+      "is_hallucination": true
+    },
+    {
+      "question": "What is the policy on sabbatical leave after 5 years of service?",
+      "answer": "Based on the policy documents: \n\u2022 Leave policy provides 20 annual days.\n\u2022 o Processes and circumstances for layoff and termination may be outlined in the policy\n[Source: sample_policy.pdf, 080420092054-gsv5i1.pdf]",
+      "faithfulness": 0.0,
+      "is_hallucination": true
+    },
+    {
+      "question": "What is the policy for anti-harassment and non-discrimination reporting?",
+      "answer": "Based on the policy documents: \n\u2022 o Processes and circumstances for layoff and termination may be outlined in the policy\n\u2022 o Performance evaluation process at the end of the probationary period\n\u2022 o Guidelines for equality and fair practices in the organization\n\u2022 o Procedures for Suspension in the incident of employee misconduct\n[Source: 080420092054-gsv5i1.pdf]",
+      "faithfulness": 0.0,
+      "is_hallucination": true
+    }
+  ]
+}

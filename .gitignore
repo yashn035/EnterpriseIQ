@@ -41,3 +41,5 @@ terraform/*.tfstate.backup
 node_modules/
 dist/
 build/
+playwright-report/
+test-results/

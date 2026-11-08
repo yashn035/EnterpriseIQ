@@ -39,6 +39,7 @@ load_dotenv(dotenv_path=env_path if env_path.exists() else None)
 # Environment-Aware Logging Setup
 ENV_NAME = os.getenv("ENVIRONMENT", "development").lower()
 LOG_LEVEL = logging.WARNING if ENV_NAME == "production" else logging.INFO
+ASK_RATE_LIMIT = os.getenv("ASK_RATE_LIMIT", "1000/minute" if ENV_NAME != "production" else "5/minute")
 
 
 class JsonFormatter(logging.Formatter):
@@ -276,8 +277,11 @@ async def get_metrics():
     return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
+def get_ask_rate_limit() -> str:
+    return os.getenv("ASK_RATE_LIMIT", "5/minute")
+
 @app.post("/ask", response_model=AnswerResponse)
-@limiter.limit("5/minute")
+@limiter.limit(get_ask_rate_limit)
 async def ask_question(request: Request, payload: QuestionRequest, debug: bool = Query(False)):
     """
     Asynchronous POST endpoint to process questions via RAGChain.
@@ -315,6 +319,7 @@ async def ask_question(request: Request, payload: QuestionRequest, debug: bool =
             debug_metadata = {
                 "query": question,
                 "retrieved_count": len(context_chunks),
+                "contexts": [c.get("text", "") for c in context_chunks if c.get("text")],
                 "chunks": [
                     {
                         "score": c.get("score"),
@@ -322,6 +327,7 @@ async def ask_question(request: Request, payload: QuestionRequest, debug: bool =
                         "source_file": c.get("source_file"),
                         "page_number": c.get("page_number"),
                         "section_heading": c.get("section_heading"),
+                        "text": c.get("text", ""),
                         "snippet": c.get("text", "")[:200]
                     }
                     for c in context_chunks

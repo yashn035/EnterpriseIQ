@@ -1,0 +1,414 @@
+{
+  "summary": {
+    "n_answerable": 6,
+    "n_unanswerable": 34,
+    "answerable_passing": "6 / 6",
+    "correctly_refused": "26 / 34",
+    "unanswerable_hallucinations": "8 / 34",
+    "real_quality_failures": 6,
+    "false_positive_hallucinations": 2,
+    "in_scope_correct_behavior": "32 / 40"
+  },
+  "cases": [
+    {
+      "num": 1,
+      "question": "What is the standard remote work policy for employees?",
+      "category": "conditional",
+      "exists": "YES",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents:  \u2022 Remote work poli...",
+      "verdict": "PASS"
+    },
+    {
+      "num": 2,
+      "question": "How many paid annual leave days are granted to full-time staff?",
+      "category": "factual",
+      "exists": "YES",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents:  \u2022 Full-time employ...",
+      "verdict": "PASS"
+    },
+    {
+      "num": 3,
+      "question": "What is the policy for submitting expense reimbursement reports?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 4,
+      "question": "What are the core hours when employees must be available?",
+      "category": "factual",
+      "exists": "YES",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents:  \u2022 Core hours are 1...",
+      "verdict": "PASS"
+    },
+    {
+      "num": 5,
+      "question": "How many sick leave days are provided per year?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents:  \u2022 Full-time employ...",
+      "verdict": "FALSE_POSITIVE_HALLUCINATION"
+    },
+    {
+      "num": 6,
+      "question": "What is the policy on company laptop security and disk encryption?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 7,
+      "question": "What is the protocol for reporting a suspected cybersecurity incident?",
+      "category": "factual",
+      "exists": "YES",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents: Cybersecurity polic...",
+      "verdict": "PASS"
+    },
+    {
+      "num": 8,
+      "question": "What is the policy regarding personal device usage for work (BYOD)?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "NO",
+      "actual": "Based on the policy documents:  \u2022 Remote work poli...",
+      "verdict": "SYNTHESIS_FAIL"
+    },
+    {
+      "num": 9,
+      "question": "How long is paid parental leave for primary caregivers?",
+      "category": "conditional",
+      "exists": "YES",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents:  \u2022 Primary caregive...",
+      "verdict": "PASS"
+    },
+    {
+      "num": 10,
+      "question": "What is the policy on password complexity and multi-factor authentication?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 11,
+      "question": "What is the requirement for mandatory employee compliance training?",
+      "category": "conditional",
+      "exists": "YES",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents: All employees must ...",
+      "verdict": "PASS"
+    },
+    {
+      "num": 12,
+      "question": "What is the company policy on side projects and open-source contributions?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 13,
+      "question": "What is the policy regarding office visitor access?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 14,
+      "question": "How is annual performance review score tied to bonus compensation?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 15,
+      "question": "What is the tuition reimbursement budget for professional development?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 16,
+      "question": "What is the bereavement leave policy?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 17,
+      "question": "What is the policy for corporate credit card usage?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 18,
+      "question": "What is the dress code policy in company offices?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 19,
+      "question": "What is the policy on social media usage regarding company news?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 20,
+      "question": "How are customer data retention periods enforced under GDPR?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 21,
+      "question": "What is the whistleblower protection policy?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 22,
+      "question": "What is the policy for emergency office closures due to severe weather?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 23,
+      "question": "What is the health insurance coverage start date for new hires?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 24,
+      "question": "What is the policy for 401(k) company matching contributions?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 25,
+      "question": "What is the standard notice period for voluntary resignation?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "NO",
+      "actual": "Based on the policy documents:  \u2022 o Performance ev...",
+      "verdict": "SYNTHESIS_FAIL"
+    },
+    {
+      "num": 26,
+      "question": "What is the policy regarding international remote work (work from anywhere)?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "YES",
+      "actual": "Based on the policy documents:  \u2022 Remote work poli...",
+      "verdict": "FALSE_POSITIVE_HALLUCINATION"
+    },
+    {
+      "num": 27,
+      "question": "What is the policy regarding software installation on work computers?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "NO",
+      "actual": "Based on the policy documents:  \u2022 Remote work poli...",
+      "verdict": "SYNTHESIS_FAIL"
+    },
+    {
+      "num": 28,
+      "question": "How often are employee performance check-ins required?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 29,
+      "question": "What is the policy for jury duty leave?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "NO",
+      "actual": "Based on the policy documents:  \u2022 o Processes and ...",
+      "verdict": "SYNTHESIS_FAIL"
+    },
+    {
+      "num": 30,
+      "question": "What is the policy regarding non-disclosure agreements (NDAs)?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 31,
+      "question": "What is the policy on sabbatical leave after 5 years of service?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "NO",
+      "actual": "Based on the policy documents:  \u2022 Leave policy pro...",
+      "verdict": "SYNTHESIS_FAIL"
+    },
+    {
+      "num": 32,
+      "question": "What is the policy for fitness and wellness reimbursement?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 33,
+      "question": "What is the policy for hardware refresh cycle for engineering laptops?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 34,
+      "question": "What is the policy for anti-harassment and non-discrimination reporting?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "NO",
+      "passed": "NO",
+      "actual": "Based on the policy documents:  \u2022 o Processes and ...",
+      "verdict": "SYNTHESIS_FAIL"
+    },
+    {
+      "num": 35,
+      "question": "What is the policy for cloud infrastructure access control (IAM)?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 36,
+      "question": "What is the policy on employee internet usage and monitoring?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 37,
+      "question": "What is the policy for mental health support resources?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 38,
+      "question": "What is the policy for volunteer time off (VTO)?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 39,
+      "question": "What is the policy on server backup frequency and disaster recovery?",
+      "category": "factual",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    },
+    {
+      "num": 40,
+      "question": "What is the policy for vendor risk management and security assessment?",
+      "category": "conditional",
+      "exists": "NO",
+      "refused": "YES",
+      "passed": "NO",
+      "actual": "I could not find this information in the provided ...",
+      "verdict": "CORRECT_REFUSAL"
+    }
+  ]
+}

@@ -35,3 +35,6 @@ pytest
 pytest-cov
 httpx
 rouge-score
+ragas
+datasets
+langchain-community

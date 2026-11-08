@@ -1,0 +1,37 @@
+description: "EnterpriseIQ Policy Assistant Evaluation Suite"
+
+prompts:
+  - "prompts/rag_prompt.txt"
+
+providers:
+  - id: http
+    label: rag-agent
+    config:
+      url: http://localhost:8000/ask
+      method: POST
+      headers:
+        Content-Type: application/json
+      body:
+        question: "{{question}}"
+      transformResponse: json.answer
+  - id: http
+    label: safety
+    config:
+      url: http://localhost:8000/ask
+      method: POST
+      headers:
+        Content-Type: application/json
+      body:
+        question: "{{question}}"
+      transformResponse: json.answer
+
+defaultTest:
+  options:
+    provider: python:scripts/judge_provider.py
+
+tests:
+  - golden_dataset.jsonl
+  - tests/safety_tests.yaml
+
+outputPath: eval_results/promptfoo_results.json
+
