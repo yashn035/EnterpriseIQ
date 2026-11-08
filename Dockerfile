@@ -3,7 +3,8 @@ FROM python:3.10-slim
 
 # Prevent Python from writing .pyc files & enable unbuffered logging
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PORT=10000
 
 # Set working directory
 WORKDIR /app
@@ -14,6 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Install PyTorch CPU first to keep image lightweight and avoid Render free tier memory/disk exhaustion
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
 # Copy requirements and install python packages
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -21,11 +25,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application source code
 COPY . .
 
-# Make start.sh executable
+# Ensure start.sh has execution permissions
 RUN chmod +x /app/start.sh
 
-# Expose default port
-EXPOSE 8000 10000
+# Expose Render default port
+EXPOSE 10000
 
-# Default command to launch Streamlit application using $PORT
+# Default command to launch application
 CMD ["/app/start.sh"]

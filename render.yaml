@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: enterpriseiq
+    runtime: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: STREAMLIT_SERVER_PORT
+        value: 10000
+      - key: STREAMLIT_SERVER_ADDRESS
+        value: 0.0.0.0
+      - key: STREAMLIT_SERVER_HEADLESS
+        value: true
+      - key: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+        value: false
+      - key: RERANK_REFUSE_THRESHOLD
+        value: -5.0
