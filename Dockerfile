@@ -15,8 +15,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PyTorch CPU first to keep image lightweight and avoid Render free tier memory/disk exhaustion
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# Upgrade pip to modern standard for wheel metadata handling
+RUN pip install --no-cache-dir --upgrade pip
+
+# Install CPU-only PyTorch using --extra-index-url so PyPI remains available for build dependencies
+RUN pip install --no-cache-dir torch --extra-index-url https://download.pytorch.org/whl/cpu
 
 # Copy requirements and install python packages
 COPY requirements.txt .

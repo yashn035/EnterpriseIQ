@@ -1,0 +1,13 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+node_modules
+playwright-report
+test-results
+.env
+.coverage
+htmlcov
+.hypothesis
