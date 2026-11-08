@@ -1,12 +1,62 @@
 # EnterpriseIQ - End-to-End Enterprise RAG System
 
+[![Live Demo](https://img.shields.io/badge/Render-Live%20Demo-46E3B7?logo=render&logoColor=white)](https://enterpriseiq-1.onrender.com)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![Coverage](https://img.shields.io/badge/coverage-80%25%2B-blue.svg)
 ![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.12-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-1.0.0-009688.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-EnterpriseIQ is a production-grade Enterprise Retrieval-Augmented Generation (RAG) system for strict document intelligence and policy question answering. Built with FastAPI, Pinecone Serverless, Mistral-7B (TGI), Streamlit, Weights & Biases, Prometheus observability, and automated Terraform CI/CD infrastructure.
+EnterpriseIQ is a production-grade Enterprise Retrieval-Augmented Generation (RAG) system for strict document intelligence and policy question answering. Built with FastAPI, Pinecone Serverless, Mistral-7B (TGI), Streamlit, Weights & Biases, Prometheus observability, automated GitHub Actions CI/CD with hallucination prevention gates, and containerized deployment on Render.
+
+🔗 **Live Application URL**: [https://enterpriseiq-1.onrender.com](https://enterpriseiq-1.onrender.com)
+
+---
+
+## 🛡️ Measured Quality Engineering Scorecard
+
+Full empirical evaluation report and reproduction commands available in [`eval_results/FINAL_REPORT.md`](file:///c:/Users/yashn/EnterpriseIQ/eval_results/FINAL_REPORT.md).
+
+| Metric | Measured Value | Status | Method / Description |
+| :--- | :---: | :---: | :--- |
+| **Out-of-Scope Refusal Rate** | **10 / 10 (100.0%)** | MEASURED | promptfoo + keyword refusal verification on off-topic questions |
+| **AI Safety Suite Pass Rate** | **14 / 15 (93.3%)** | MEASURED | 4-category promptfoo suite (PI 3/4, Jailbreak 4/4, PII 4/4, Blocked 3/3) |
+| **In-Scope Correct Behaviour** | **32 / 40 (80.0%)** | MEASURED | 26 unanswerable correctly refused + 6 answerable passing with citations |
+| **Unanswerable-Query Refusal** | **26 / 34 (76.5%)** | MEASURED | Layer 1 neural cross-encoder hard gate refusal on absent policy docs |
+| **Answerable Query Quality** | **6 / 6 (100.0%, n=6)** | MEASURED | promptfoo contains assertions on all 6 answerable corpus questions |
+| **False-Refusal Rate (Answerable)**| **0 / 6 (0.0%)** | MEASURED | Zero false refusals on queries with supporting corpus documents |
+| **Held-Out Guardrail Pass Rate** | **9 / 10 (90.0%)** | MEASURED | Seed 42 held-out adversarial split with strict fallback refusal requirement |
+| **CI Hallucination Prevention Gate**| **Verified to Fail** | PROVEN | Gate demonstrably halts release (exit code 1) on guardrail regressions |
+| **Playwright E2E UI Pass Rate** | **5 / 5 (100.0%)** | MEASURED | Chromium headless E2E suite (Streamlit UI + API harness) |
+| **Pytest Unit & Integration Suite**| **7 / 7 (100.0%)** | MEASURED | Unit tests with coverage and slowapi rate-limiting |
+| **Ragas Faithfulness & Precision** | `null` | UNMEASURED | Mistral TGI local judge endpoint offline at evaluation time |
+
+---
+
+## 🏛️ Two-Layer Guardrail Architecture
+
+```mermaid
+flowchart TD
+    UserQuery([User Input]) --> API[FastAPI /ask]
+    API --> Dense[Dense Retrieval: Top-20 Chunks]
+    Dense --> Rerank[Cross-Encoder Reranker: ms-marco-MiniLM-L-6-v2]
+    
+    subgraph Layer1 [Layer 1: Deterministic Cross-Encoder Hard Gate]
+        Rerank --> ScoreCheck{Max Cross-Encoder Score < -5.0?}
+        ScoreCheck -- YES --> RefuseDeterministic["Immediate Fallback Refusal: 'I could not find this information...'"]
+    end
+    
+    subgraph Layer2 [Layer 2: Two-Step Scope-Check Prompt]
+        ScoreCheck -- NO --> ScopeCheckPrompt["System Prompt: STEP 1 - Scope Check (HR/Benefits/Security)"]
+        ScopeCheckPrompt --> ModelGen[Mistral-7B / Extractive Circuit Breaker]
+        ModelGen --> RefusePrompt["Refusal if Off-Topic / Malicious"]
+        ModelGen --> AnswerCitations["Grounded Answer + [Source: file.pdf]"]
+    end
+    
+    RefuseDeterministic --> Response([Client Response])
+    RefusePrompt --> Response
+    AnswerCitations --> Response
+```
 
 ---
 
